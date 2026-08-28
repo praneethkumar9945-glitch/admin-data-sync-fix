@@ -9,27 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppChatRouteImport } from './routes/app.chat'
 import { Route as AppAgentRouteImport } from './routes/app.agent'
-import { Route as AppAdminUploadRouteImport } from './routes/app.admin.upload'
-import { Route as AppAdminReportsRouteImport } from './routes/app.admin.reports'
-import { Route as AppAdminAssignRouteImport } from './routes/app.admin.assign'
-import { Route as AppAdminAnalyticsRouteImport } from './routes/app.admin.analytics'
+import { Route as AppChatRouteImport } from './routes/app.chat'
 import { Route as AppAdminAgentsRouteImport } from './routes/app.admin.agents'
+import { Route as AppAdminAnalyticsRouteImport } from './routes/app.admin.analytics'
+import { Route as AppAdminAssignRouteImport } from './routes/app.admin.assign'
+import { Route as AppAdminReportsRouteImport } from './routes/app.admin.reports'
+import { Route as AppAdminUploadRouteImport } from './routes/app.admin.upload'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -37,9 +32,14 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -47,29 +47,19 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppChatRoute = AppChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppAgentRoute = AppAgentRouteImport.update({
   id: '/agent',
   path: '/agent',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminUploadRoute = AppAdminUploadRouteImport.update({
-  id: '/admin/upload',
-  path: '/admin/upload',
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminReportsRoute = AppAdminReportsRouteImport.update({
-  id: '/admin/reports',
-  path: '/admin/reports',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAdminAssignRoute = AppAdminAssignRouteImport.update({
-  id: '/admin/assign',
-  path: '/admin/assign',
+const AppAdminAgentsRoute = AppAdminAgentsRouteImport.update({
+  id: '/admin/agents',
+  path: '/admin/agents',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAdminAnalyticsRoute = AppAdminAnalyticsRouteImport.update({
@@ -77,9 +67,19 @@ const AppAdminAnalyticsRoute = AppAdminAnalyticsRouteImport.update({
   path: '/admin/analytics',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminAgentsRoute = AppAdminAgentsRouteImport.update({
-  id: '/admin/agents',
-  path: '/admin/agents',
+const AppAdminAssignRoute = AppAdminAssignRouteImport.update({
+  id: '/admin/assign',
+  path: '/admin/assign',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminReportsRoute = AppAdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminUploadRoute = AppAdminUploadRouteImport.update({
+  id: '/admin/upload',
+  path: '/admin/upload',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -178,18 +178,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -199,11 +192,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -213,13 +213,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/chat': {
-      id: '/app/chat'
-      path: '/chat'
-      fullPath: '/app/chat'
-      preLoaderRoute: typeof AppChatRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/agent': {
       id: '/app/agent'
       path: '/agent'
@@ -227,25 +220,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgentRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/admin/upload': {
-      id: '/app/admin/upload'
-      path: '/admin/upload'
-      fullPath: '/app/admin/upload'
-      preLoaderRoute: typeof AppAdminUploadRouteImport
+    '/app/chat': {
+      id: '/app/chat'
+      path: '/chat'
+      fullPath: '/app/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/admin/reports': {
-      id: '/app/admin/reports'
-      path: '/admin/reports'
-      fullPath: '/app/admin/reports'
-      preLoaderRoute: typeof AppAdminReportsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/admin/assign': {
-      id: '/app/admin/assign'
-      path: '/admin/assign'
-      fullPath: '/app/admin/assign'
-      preLoaderRoute: typeof AppAdminAssignRouteImport
+    '/app/admin/agents': {
+      id: '/app/admin/agents'
+      path: '/admin/agents'
+      fullPath: '/app/admin/agents'
+      preLoaderRoute: typeof AppAdminAgentsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/admin/analytics': {
@@ -255,11 +241,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/admin/agents': {
-      id: '/app/admin/agents'
-      path: '/admin/agents'
-      fullPath: '/app/admin/agents'
-      preLoaderRoute: typeof AppAdminAgentsRouteImport
+    '/app/admin/assign': {
+      id: '/app/admin/assign'
+      path: '/admin/assign'
+      fullPath: '/app/admin/assign'
+      preLoaderRoute: typeof AppAdminAssignRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/reports': {
+      id: '/app/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/app/admin/reports'
+      preLoaderRoute: typeof AppAdminReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/upload': {
+      id: '/app/admin/upload'
+      path: '/admin/upload'
+      fullPath: '/app/admin/upload'
+      preLoaderRoute: typeof AppAdminUploadRouteImport
       parentRoute: typeof AppRoute
     }
   }
