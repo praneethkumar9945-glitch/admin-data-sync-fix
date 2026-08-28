@@ -30,7 +30,7 @@ export const listAllLeads = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
-// List leads assigned to current user (agent)
+// List leads visible to current agent: assigned to them + unassigned pool
 export const listMyLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -38,11 +38,12 @@ export const listMyLeads = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("leads")
       .select("*")
-      .eq("assigned_to", userId)
+      .or(`assigned_to.eq.${userId},assigned_to.is.null`)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
 
 const LeadInput = z.object({
   name: z.string().min(1).max(200),
