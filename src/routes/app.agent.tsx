@@ -80,6 +80,11 @@ function AgentLeadsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="mb-2 flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{l.name}</h3>
+                    {l.assigned_to === null && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+                        Unassigned
+                      </span>
+                    )}
                     {l.source && (
                       <span className="rounded-full border border-slate-200 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:border-slate-700 dark:text-slate-400">
                         {l.source}
