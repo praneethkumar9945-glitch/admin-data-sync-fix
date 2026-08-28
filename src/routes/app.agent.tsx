@@ -64,9 +64,10 @@ function AgentLeadsPage() {
           <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md">
             <Inbox className="h-7 w-7" />
           </div>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">No leads assigned yet</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">No leads yet</h3>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Once an admin assigns leads to you, they'll appear here.
+            Leads uploaded or assigned by an admin will appear here.
+
           </p>
         </div>
       ) : (
