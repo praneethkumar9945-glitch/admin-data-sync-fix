@@ -118,13 +118,25 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const patch: { status: string; notes?: string } = { status: data.status };
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
+      .from("leads")
+      .select("assigned_to")
+      .eq("id", data.leadId)
+      .maybeSingle();
+
+    const patch: { status: string; notes?: string; assigned_to?: string } = {
+      status: data.status,
+    };
     if (data.notes !== undefined) patch.notes = data.notes;
+    // Working an unassigned (freshly uploaded) lead claims it for this user
+    if (existing && existing.assigned_to === null) patch.assigned_to = userId;
+
     const { error } = await supabase.from("leads").update(patch).eq("id", data.leadId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 // Clear leads (admin only — enforced by RLS). scope: "all" | "unassigned"
 export const clearLeads = createServerFn({ method: "POST" })
