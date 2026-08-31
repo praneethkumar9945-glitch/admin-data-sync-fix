@@ -17,16 +17,30 @@ type ParsedLead = {
   notes?: string | null;
 };
 
+function norm(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function pick(row: Record<string, unknown>, keys: string[]): string | null {
-  for (const k of keys) {
+  const nk = keys.map(norm);
+  for (const k of nk) {
     for (const rk of Object.keys(row)) {
-      if (rk.toLowerCase().trim() === k) {
+      if (norm(rk) === k) {
         const v = row[rk];
         if (v != null && String(v).trim() !== "") return String(v).trim();
       }
     }
   }
   return null;
+}
+
+// Merged header cells in the sample sheet produce "Unnamed: N" columns that
+// still carry values (e.g. the course next to the college name).
+function unnamedValues(row: Record<string, unknown>): string[] {
+  return Object.keys(row)
+    .filter((k) => /^unnamed/i.test(k.trim()))
+    .map((k) => (row[k] == null ? "" : String(row[k]).trim()))
+    .filter((v) => v !== "");
 }
 
 function UploadPage() {
