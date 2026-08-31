@@ -138,6 +138,31 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
   });
 
 
+// Log a call: claims unassigned lead for this agent and appends a timestamped note
+export const logLeadCall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ leadId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
+      .from("leads")
+      .select("assigned_to, notes")
+      .eq("id", data.leadId)
+      .maybeSingle();
+    if (!existing) throw new Error("Lead not found");
+
+    const stamp = new Date().toLocaleString();
+    const entry = `[Call ${stamp}]`;
+    const patch: { notes: string; assigned_to?: string } = {
+      notes: existing.notes ? `${existing.notes}\n${entry}` : entry,
+    };
+    if (existing.assigned_to === null) patch.assigned_to = userId;
+
+    const { error } = await supabase.from("leads").update(patch).eq("id", data.leadId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // Clear leads (admin only — enforced by RLS). scope: "all" | "unassigned"
 export const clearLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
