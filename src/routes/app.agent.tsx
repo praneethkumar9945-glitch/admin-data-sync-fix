@@ -106,6 +106,11 @@ function AgentLeadsPage() {
                       <a
                         href={`tel:${l.phone.replace(/[^+\d]/g, "")}`}
                         aria-label={`Call ${l.name} at ${l.phone}`}
+                        onClick={() => {
+                          doLogCall({ data: { leadId: l.id } })
+                            .then(() => qc.invalidateQueries({ queryKey: ["leads"] }))
+                            .catch(() => {});
+                        }}
                         className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition active:scale-95 hover:shadow-lg hover:brightness-110"
                       >
                         <Phone className="h-4 w-4" /> Call {l.phone}
