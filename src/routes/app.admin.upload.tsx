@@ -17,16 +17,30 @@ type ParsedLead = {
   notes?: string | null;
 };
 
+function norm(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function pick(row: Record<string, unknown>, keys: string[]): string | null {
-  for (const k of keys) {
+  const nk = keys.map(norm);
+  for (const k of nk) {
     for (const rk of Object.keys(row)) {
-      if (rk.toLowerCase().trim() === k) {
+      if (norm(rk) === k) {
         const v = row[rk];
         if (v != null && String(v).trim() !== "") return String(v).trim();
       }
     }
   }
   return null;
+}
+
+// Merged header cells in the sample sheet produce "Unnamed: N" columns that
+// still carry values (e.g. the course next to the college name).
+function unnamedValues(row: Record<string, unknown>): string[] {
+  return Object.keys(row)
+    .filter((k) => /^unnamed/i.test(k.trim()))
+    .map((k) => (row[k] == null ? "" : String(row[k]).trim()))
+    .filter((v) => v !== "");
 }
 
 function UploadPage() {
@@ -52,28 +66,67 @@ function UploadPage() {
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: "array" });
     const sheet = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+    // Find the header row (files sometimes start with a title row)
+    const grid = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: "" });
+    let headerRow = 0;
+    for (let i = 0; i < Math.min(grid.length, 15); i++) {
+      const cells = (grid[i] ?? []).map((c) => norm(String(c ?? "")));
+      if (cells.some((c) => c.includes("name")) && cells.some((c) => c.includes("mobile") || c.includes("phone") || c.includes("email"))) {
+        headerRow = i;
+        break;
+      }
+    }
+    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: "",
+      range: headerRow,
+    });
     const parsed: ParsedLead[] = [];
     for (const r of json) {
-      const name = pick(r, ["name", "full name", "customer", "lead"]);
+      const name = pick(r, ["student name", "students name", "name", "full name", "customer", "lead"]);
       if (!name) continue;
+
+      const college = pick(r, ["collage name", "college name", "college", "institution", "source", "channel"]);
+      const place = pick(r, ["place", "city", "location", "district"]);
+      const prev = pick(r, ["privous coures", "previous course", "previous coures", "prev course", "qualification"]);
+      const extras = unnamedValues(r);
+      const course = pick(r, ["course", "degree", "stream"]) ?? extras[0] ?? null;
+      const sl = pick(r, ["sl.no", "slno", "sl no", "s.no", "sno"]);
+      const existingNotes = pick(r, ["notes", "comments", "remarks"]);
+
+      const noteParts = [
+        sl ? `SL No: ${sl}` : null,
+        college ? `College: ${college}` : null,
+        course ? `Course: ${course}` : null,
+        place ? `Place: ${place}` : null,
+        prev ? `Previous course: ${prev}` : null,
+        existingNotes,
+      ].filter(Boolean) as string[];
+
       parsed.push({
         name,
-        phone: pick(r, ["phone", "mobile", "contact", "number"]),
-        email: pick(r, ["email", "e-mail"]),
-        source: pick(r, ["source", "channel"]),
-        notes: pick(r, ["notes", "comments", "remarks"]),
+        phone: pick(r, ["mobile number", "mobile no", "mobile", "phone number", "phone", "contact number", "contact", "number"]),
+        email: pick(r, ["email", "email id", "e-mail", "mail"]),
+        source: college,
+        notes: noteParts.length ? noteParts.join(" | ") : null,
       });
     }
     setRows(parsed);
-    if (parsed.length === 0) toast.warning("No valid rows found. Need a 'name' column.");
+    if (parsed.length === 0) toast.warning("No valid rows found. Need a 'student name' column.");
   }
 
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Upload an Excel or CSV file. Expected columns: <span className="font-medium text-slate-800 dark:text-slate-200">name, phone, email, source, notes</span>.
+          Upload an Excel or CSV file in the standard format — columns:{" "}
+          <span className="font-medium text-slate-800 dark:text-slate-200">
+            SL.no, Collage name, Course, student name, place, mobile number, privous coures, email
+          </span>
+          .
+        </p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          Student name and mobile number are used as the lead's name and phone; college becomes the source, and course /
+          place / previous course are saved into the lead notes.
         </p>
       </div>
 
@@ -119,10 +172,11 @@ function UploadPage() {
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-slate-50 text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                   <tr>
-                    <th className="p-3 text-left font-semibold">Name</th>
-                    <th className="p-3 text-left font-semibold">Phone</th>
+                    <th className="p-3 text-left font-semibold">Student name</th>
+                    <th className="p-3 text-left font-semibold">Mobile</th>
                     <th className="p-3 text-left font-semibold">Email</th>
-                    <th className="p-3 text-left font-semibold">Source</th>
+                    <th className="p-3 text-left font-semibold">College</th>
+                    <th className="p-3 text-left font-semibold">Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -132,6 +186,7 @@ function UploadPage() {
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.phone}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.email}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.source}</td>
+                      <td className="max-w-xs truncate p-3 text-xs text-slate-500 dark:text-slate-400">{r.notes}</td>
                     </tr>
                   ))}
                 </tbody>
