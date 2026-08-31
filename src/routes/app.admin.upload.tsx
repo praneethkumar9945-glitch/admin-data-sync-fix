@@ -118,7 +118,15 @@ function UploadPage() {
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Upload an Excel or CSV file. Expected columns: <span className="font-medium text-slate-800 dark:text-slate-200">name, phone, email, source, notes</span>.
+          Upload an Excel or CSV file in the standard format — columns:{" "}
+          <span className="font-medium text-slate-800 dark:text-slate-200">
+            SL.no, Collage name, Course, student name, place, mobile number, privous coures, email
+          </span>
+          .
+        </p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          Student name and mobile number are used as the lead's name and phone; college becomes the source, and course /
+          place / previous course are saved into the lead notes.
         </p>
       </div>
 
