@@ -186,6 +186,7 @@ function UploadPage() {
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.phone}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.email}</td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{r.source}</td>
+                      <td className="max-w-xs truncate p-3 text-xs text-slate-500 dark:text-slate-400">{r.notes}</td>
                     </tr>
                   ))}
                 </tbody>
