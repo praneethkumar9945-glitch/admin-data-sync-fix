@@ -100,21 +100,23 @@ function AgentLeadsPage() {
                       {STATUS_LABELS[l.status as keyof typeof STATUS_LABELS] ?? l.status}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
                     {l.phone && (
                       <a
-                        href={`tel:${l.phone}`}
-                        className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        href={`tel:${l.phone.replace(/[^+\d]/g, "")}`}
+                        aria-label={`Call ${l.name} at ${l.phone}`}
+                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition active:scale-95 hover:shadow-lg hover:brightness-110"
                       >
-                        <Phone className="h-4 w-4" /> {l.phone}
+                        <Phone className="h-4 w-4" /> Call {l.phone}
                       </a>
                     )}
                     {l.email && (
                       <a
                         href={`mailto:${l.email}`}
-                        className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        aria-label={`Email ${l.name}`}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium transition hover:border-indigo-300 hover:text-indigo-600 dark:border-slate-700 dark:hover:border-indigo-500/50 dark:hover:text-indigo-400"
                       >
-                        <Mail className="h-4 w-4" /> {l.email}
+                        <Mail className="h-4 w-4" /> Email
                       </a>
                     )}
                   </div>
