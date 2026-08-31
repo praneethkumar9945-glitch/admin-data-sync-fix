@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { listMyLeads, updateLeadStatus } from "@/lib/leads.functions";
+import { listMyLeads, updateLeadStatus, logLeadCall } from "@/lib/leads.functions";
 import {
   Select,
   SelectContent,
@@ -29,6 +29,7 @@ function AgentLeadsPage() {
   const qc = useQueryClient();
   const fetchLeads = useServerFn(listMyLeads);
   const doUpdate = useServerFn(updateLeadStatus);
+  const doLogCall = useServerFn(logLeadCall);
   const { data: leads } = useSuspenseQuery({ queryKey: ["leads", "mine"], queryFn: () => fetchLeads() });
 
   const mut = useMutation({
