@@ -172,10 +172,11 @@ function UploadPage() {
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-slate-50 text-xs uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                   <tr>
-                    <th className="p-3 text-left font-semibold">Name</th>
-                    <th className="p-3 text-left font-semibold">Phone</th>
+                    <th className="p-3 text-left font-semibold">Student name</th>
+                    <th className="p-3 text-left font-semibold">Mobile</th>
                     <th className="p-3 text-left font-semibold">Email</th>
-                    <th className="p-3 text-left font-semibold">Source</th>
+                    <th className="p-3 text-left font-semibold">College</th>
+                    <th className="p-3 text-left font-semibold">Details</th>
                   </tr>
                 </thead>
                 <tbody>
