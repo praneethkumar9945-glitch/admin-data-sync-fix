@@ -26,6 +26,7 @@ export type Database = {
           phone: string | null
           source: string | null
           status: string
+          team_id: string | null
           updated_at: string
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           phone?: string | null
           source?: string | null
           status?: string
+          team_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -52,9 +54,18 @@ export type Database = {
           phone?: string | null
           source?: string | null
           status?: string
+          team_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -86,18 +97,53 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          team_id: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          team_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          leader_id: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          leader_id?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          leader_id?: string | null
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -138,9 +184,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_team_id: { Args: never; Returns: string }
     }
     Enums: {
-      app_role: "admin" | "agent"
+      app_role: "admin" | "agent" | "ceo" | "team_leader"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -268,7 +315,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "agent"],
+      app_role: ["admin", "agent", "ceo", "team_leader"],
     },
   },
 } as const
