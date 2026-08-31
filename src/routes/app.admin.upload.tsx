@@ -66,21 +66,52 @@ function UploadPage() {
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: "array" });
     const sheet = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+    // Find the header row (files sometimes start with a title row)
+    const grid = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: "" });
+    let headerRow = 0;
+    for (let i = 0; i < Math.min(grid.length, 15); i++) {
+      const cells = (grid[i] ?? []).map((c) => norm(String(c ?? "")));
+      if (cells.some((c) => c.includes("name")) && cells.some((c) => c.includes("mobile") || c.includes("phone") || c.includes("email"))) {
+        headerRow = i;
+        break;
+      }
+    }
+    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: "",
+      range: headerRow,
+    });
     const parsed: ParsedLead[] = [];
     for (const r of json) {
-      const name = pick(r, ["name", "full name", "customer", "lead"]);
+      const name = pick(r, ["student name", "students name", "name", "full name", "customer", "lead"]);
       if (!name) continue;
+
+      const college = pick(r, ["collage name", "college name", "college", "institution", "source", "channel"]);
+      const place = pick(r, ["place", "city", "location", "district"]);
+      const prev = pick(r, ["privous coures", "previous course", "previous coures", "prev course", "qualification"]);
+      const extras = unnamedValues(r);
+      const course = pick(r, ["course", "degree", "stream"]) ?? extras[0] ?? null;
+      const sl = pick(r, ["sl.no", "slno", "sl no", "s.no", "sno"]);
+      const existingNotes = pick(r, ["notes", "comments", "remarks"]);
+
+      const noteParts = [
+        sl ? `SL No: ${sl}` : null,
+        college ? `College: ${college}` : null,
+        course ? `Course: ${course}` : null,
+        place ? `Place: ${place}` : null,
+        prev ? `Previous course: ${prev}` : null,
+        existingNotes,
+      ].filter(Boolean) as string[];
+
       parsed.push({
         name,
-        phone: pick(r, ["phone", "mobile", "contact", "number"]),
-        email: pick(r, ["email", "e-mail"]),
-        source: pick(r, ["source", "channel"]),
-        notes: pick(r, ["notes", "comments", "remarks"]),
+        phone: pick(r, ["mobile number", "mobile no", "mobile", "phone number", "phone", "contact number", "contact", "number"]),
+        email: pick(r, ["email", "email id", "e-mail", "mail"]),
+        source: college,
+        notes: noteParts.length ? noteParts.join(" | ") : null,
       });
     }
     setRows(parsed);
-    if (parsed.length === 0) toast.warning("No valid rows found. Need a 'name' column.");
+    if (parsed.length === 0) toast.warning("No valid rows found. Need a 'student name' column.");
   }
 
   return (
